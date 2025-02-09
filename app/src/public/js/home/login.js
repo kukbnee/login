@@ -17,6 +17,15 @@
       },
       body: JSON.stringify(reqParam)
     }).then((res) => res.json())
-    .then((res) => console.log(res.json()));
+    .then((res) => {
+      if (res.success) {
+        location.href = '/';
+      } else {
+        alert(res.msg);
+      }
+    })
+    .catch((err) => {
+      console.error(new Error('로그인중 에러 발생'));
+    });
   };
   loginBtn.addEventListener('click', doLogin);
