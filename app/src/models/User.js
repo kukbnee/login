@@ -21,6 +21,22 @@ class User {
       msg: '존재하지 않는 아이디'
      };
   }
+
+  async register() {
+    // const { id } = await UserStorage.getUserInfo(this.body.id)
+    // if (id) {
+    //   return {success: false,
+    //     msg: '이미 존재하는 아이디'
+    //   };
+    // }
+    try {
+      await UserStorage.setUserInfo(this.body)
+      return { success: true, msg: '회원가입이 되었습니다.'};
+    } catch (err) {
+      console.log(err);
+      return { success: false, msg: err };
+    }
+  }
 }
 
 module.exports = User;

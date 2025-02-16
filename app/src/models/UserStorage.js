@@ -14,8 +14,8 @@ class UserStorage {
     return userInfo;
   }
 
-  static getUser = (...userKeys) => {
-    // const users = this.#users;
+  static #getAllUserInfo(data, userKeys) {
+    const users = JSON.parse(data);
     return userKeys.reduce((userLoad , userKey) => {
       if (users.hasOwnProperty(userKey)) {
         userLoad[userKey] = users[userKey];
@@ -23,24 +23,44 @@ class UserStorage {
       return userLoad;
     }, {});
   }
-  
-  static getUserInfo(id) {
-    // const users = this.#users;
+
+  static getUsers = (...userKeys) => {
     return fs.readFile('./src/databases/users.json')
     .then(res => {
-      return this.#getUserInfo(res, id);
+    return this.#getAllUserInfo(res, userKeys);
 
     })
     .catch(err => {
       throw err;
     });
-      // .then((req, res) => {
-      //   console.log('>>>', res);
-      // })
-      // .catch(err => {
-      //   console.log(err);
-      // })
     
+  }
+  
+  static getUserInfo(id) {
+    // const users = this.#users;
+    return fs.readFile('./src/databases/users.json')
+      .then(res => {
+      return this.#getUserInfo(res, id);
+
+      })
+      .catch(err => {
+        throw err;
+      });
+  }
+
+  
+
+  static async setUserInfo(newUserInfo) {
+    const users = await this.getUsers('id');
+    if (users.id.includes(newUserInfo.id)) {
+      throw '이미 존재하는 아이디입니다.';
+    }
+    delete newUserInfo.pwConfirm;
+    const allUserInfo = await fs.readFile('./src/databases/users.json').then(res => JSON.parse(res));
+    allUserInfo.id.push(newUserInfo.id);
+    allUserInfo.pw.push(newUserInfo.pw);
+    allUserInfo.name.push(newUserInfo.name);
+    fs.writeFile('./src/databases/users.json', JSON.stringify(allUserInfo)); 
   }
 }
 
