@@ -1,6 +1,6 @@
 "use strict";
 
-const fs = require('fs').promises;
+const db = require('../config/db');
 
 class UserStorage {
   static #getUserInfo = (data, id) => {
@@ -25,42 +25,17 @@ class UserStorage {
   }
 
   static getUsers = (...userKeys) => {
-    return fs.readFile('./src/databases/users.json')
-    .then(res => {
-    return this.#getAllUserInfo(res, userKeys);
-
-    })
-    .catch(err => {
-      throw err;
-    });
     
   }
   
   static getUserInfo(id) {
-    // const users = this.#users;
-    return fs.readFile('./src/databases/users.json')
-      .then(res => {
-      return this.#getUserInfo(res, id);
-
-      })
-      .catch(err => {
-        throw err;
-      });
+    db.query('SELECT * FROM users WHERE id = ?', [id], (err, data) => {
+      console.log(data);
+    });
   }
 
-  
-
   static async setUserInfo(newUserInfo) {
-    const users = await this.getUsers('id');
-    if (users.id.includes(newUserInfo.id)) {
-      throw '이미 존재하는 아이디입니다.';
-    }
-    delete newUserInfo.pwConfirm;
-    const allUserInfo = await fs.readFile('./src/databases/users.json').then(res => JSON.parse(res));
-    allUserInfo.id.push(newUserInfo.id);
-    allUserInfo.pw.push(newUserInfo.pw);
-    allUserInfo.name.push(newUserInfo.name);
-    fs.writeFile('./src/databases/users.json', JSON.stringify(allUserInfo)); 
+
   }
 }
 
